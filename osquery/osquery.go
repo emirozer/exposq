@@ -1,4 +1,4 @@
-package exposq
+package osquery
 
 // Function returns a map of pre-built osqueries specific to CentOS
 func CentOsQueries() map[string]string {
@@ -40,7 +40,7 @@ func GenericOsQueries() map[string]string {
 		"mounts": "SELECT * FROM mounts;",
 
 		//Get mount information where device_alias is none
-		"mounts": "SELECT * FROM mounts WHERE device_alias = \"none\";",
+		"mounts_device_alias_none": "SELECT * FROM mounts WHERE device_alias = \"none\";",
 
 		//Get block device information
 		"block_devices": "SELECT * FROM block_devices;",
@@ -145,7 +145,7 @@ func GenericOsQueries() map[string]string {
 		"mitm": "SELECT * FROM arp_cache;",
 
 		//Retrieves all the files in the target system that are setuid enabled.
-		"mitm": "SELECT * FROM suid_bin;",
+		"setuid_enabled": "SELECT * FROM suid_bin;",
 
 		//Quickly scan all process's executable paths to check if the binary
 		//still exists on disk. If the binary was replaced (with a newer version for example),
