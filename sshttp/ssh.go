@@ -99,11 +99,11 @@ func MainSshHandler(cmd string) string {
 		sout += string(out[:])
 
 		if len(out) == 0 && (strings.Contains(cmd, "apt_resources") || strings.Contains(cmd, "deb_packages")) {
-			sout += fmt.Sprintf("Target is RPM based, query won't return anything: %v", cmd)
+			sout += fmt.Sprintf("Target is RPM based, query won't return anything: %v\n", cmd)
 		} else if len(out) == 0 && (strings.Contains(cmd, "rpm_package_files") || strings.Contains(cmd, "rpm_packages")) {
-			sout += fmt.Sprintf("Target is APT based, query won't return anything: %v", cmd)
+			sout += fmt.Sprintf("Target is APT based, query won't return anything: %v\n", cmd)
 		} else if len(out) == 0 {
-			sout += fmt.Sprintf("No response for the following query from this machine : %v", cmd)
+			sout += fmt.Sprintf("No response for the following query from this machine : %v\n", cmd)
 		}
 	}
 

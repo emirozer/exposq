@@ -2,6 +2,7 @@ package sshttp
 
 import (
 	"fmt"
+	"html"
 	"html/template"
 	"net/http"
 	"strings"
@@ -376,6 +377,13 @@ func SetMux(mux http.ServeMux) {
 	mux.HandleFunc("/deb_packages", func(w http.ResponseWriter, req *http.Request) {
 
 		cmd := "osqueryi " + "\"" + doq["deb_packages"] + "\""
+		sout := MainSshHandler(cmd)
+		fmt.Fprintf(w, sout)
+	})
+
+	mux.HandleFunc("/custom/", func(w http.ResponseWriter, req *http.Request) {
+		cus_x := html.EscapeString(req.URL.Path)[8:]
+		cmd := "osqueryi " + "\"" + cus_x + "\""
 		sout := MainSshHandler(cmd)
 		fmt.Fprintf(w, sout)
 	})
