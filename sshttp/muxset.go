@@ -2,35 +2,58 @@ package sshttp
 
 import (
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os/exec"
+	"strings"
 
 	"github.com/emirozer/exposq/osquery"
 )
 
-// gets http.NewServeMux from main and sets the routes
+// Gets http.NewServeMux from main and sets the routes
 func SetMux(mux http.ServeMux) {
 
 	oq := osquery.GenericOsQueries()
 	coq := osquery.CentOsQueries()
 	doq := osquery.DebUbOsQueries()
 
+	const page = `<!DOCTYPE html>
+<html>
+  <head>
+<title>exposq</title>
+	<style>
+	body {background-color:black}
+	p {color:white;
+	font-family:courier;
+	}
+	</style>
+  </head>
+  <body>
+    <p>{{.}}</p>
+  </body>
+</html>`
+
+	t := template.Must(template.New("page").Parse(page))
+
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		fmt.Fprintln(w, "Generic Os Query Routes:")
+		text := ``
+		text += fmt.Sprintf("Generic Os Query Routes:\n\n")
 		for k, _ := range oq {
-			fmt.Fprintf(w, "/"+k+"\n")
+			text += fmt.Sprintf("/" + k + "\n")
 		}
-
-		fmt.Fprintln(w, " RedHat Based Os Query Routes:")
+		text += fmt.Sprintf("\nRedHat Based Os Query Routes:\n\n")
 		for k, _ := range coq {
-			fmt.Fprintf(w, "/"+k+"\n")
+			text += fmt.Sprintf("/" + k + "\n")
 		}
-
-		fmt.Fprintln(w, "Debian Based Os Query Routes:")
+		text += fmt.Sprintf("\nDebian Based Os Query Routes:\n\n")
 		for k, _ := range doq {
-			fmt.Fprintf(w, "/"+k+"\n")
+			text += fmt.Sprintf("/" + k + "\n")
 		}
+		safe := template.HTMLEscapeString(text)
+		fixed := strings.Replace(safe, "\n", "\n<br/>", -1)
+
+		t.Execute(w, template.HTML(fixed))
 
 	})
 
@@ -40,6 +63,7 @@ func SetMux(mux http.ServeMux) {
 		sout := dispatchCmd(cmd)
 
 		fmt.Fprintf(w, sout)
+
 	})
 
 	mux.HandleFunc("/kernel_integrity", func(w http.ResponseWriter, req *http.Request) {
