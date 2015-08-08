@@ -314,6 +314,46 @@ func SetMux(mux http.ServeMux) {
 		fmt.Fprintf(w, sout)
 	})
 
+	mux.HandleFunc("/relay", func(w http.ResponseWriter, req *http.Request) {
+		oq := osquery.GenericOsQueries()
+
+		cmd := "osqueryi " + "\"" + oq["relay"] + "\""
+		sout := dispatchCmd(cmd)
+		fmt.Fprintf(w, sout)
+	})
+
+	mux.HandleFunc("/mitm", func(w http.ResponseWriter, req *http.Request) {
+		oq := osquery.GenericOsQueries()
+
+		cmd := "osqueryi " + "\"" + oq["mitm"] + "\""
+		sout := dispatchCmd(cmd)
+		fmt.Fprintf(w, sout)
+	})
+
+	mux.HandleFunc("/setuid_enabled", func(w http.ResponseWriter, req *http.Request) {
+		oq := osquery.GenericOsQueries()
+
+		cmd := "osqueryi " + "\"" + oq["setuid_enabled"] + "\""
+		sout := dispatchCmd(cmd)
+		fmt.Fprintf(w, sout)
+	})
+
+	mux.HandleFunc("/q_scan_ps_bin", func(w http.ResponseWriter, req *http.Request) {
+		oq := osquery.GenericOsQueries()
+
+		cmd := "osqueryi " + "\"" + oq["q_scan_ps_bin"] + "\""
+		sout := dispatchCmd(cmd)
+		fmt.Fprintf(w, sout)
+	})
+
+	mux.HandleFunc("/ps_lst_tcp_udp", func(w http.ResponseWriter, req *http.Request) {
+		oq := osquery.GenericOsQueries()
+
+		cmd := "osqueryi " + "\"" + oq["ps_lst_tcp_udp"] + "\""
+		sout := dispatchCmd(cmd)
+		fmt.Fprintf(w, sout)
+	})
+
 }
 
 func dispatchCmd(cmd string) string {
