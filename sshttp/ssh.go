@@ -71,7 +71,10 @@ func sshDispatch(cmd string, user string, ip string, key string) string {
 	session.Stdout = &stdoutBuf
 	err = session.Run(cmd)
 	if err != nil {
-		log.Fatalf("Run failed:%v", err)
+		// upon dispatching a query that can result in Process exited with 1
+		// it shouldn't completly fail, the thing here is that that OS
+		// was not compatible with that query, so we return empty str
+		return ""
 	}
 
 	res = stdoutBuf.String()
@@ -92,15 +95,16 @@ func MainSshHandler(cmd string) string {
 		ip = j[1]
 
 		out := sshDispatch(cmd, user, ip, key)
+		sout += fmt.Sprintf("\nMachine: %v@%v\n", user, ip)
 		sout += string(out[:])
-	}
 
-	if len(sout) == 0 && (strings.Contains(cmd, "apt_resources") || strings.Contains(cmd, "deb_packages")) {
-		sout = fmt.Sprintf("Target is RPM based, query won't return anything: %v", cmd)
-	} else if len(sout) == 0 && (strings.Contains(cmd, "rpm_package_files") || strings.Contains(cmd, "rpm_packages")) {
-		sout = fmt.Sprintf("Target is APT based, query won't return anything: %v", cmd)
-	} else if len(sout) == 0 {
-		sout = fmt.Sprintf("No response for the following query from this machine : %v", cmd)
+		if len(out) == 0 && (strings.Contains(cmd, "apt_resources") || strings.Contains(cmd, "deb_packages")) {
+			sout += fmt.Sprintf("Target is RPM based, query won't return anything: %v", cmd)
+		} else if len(out) == 0 && (strings.Contains(cmd, "rpm_package_files") || strings.Contains(cmd, "rpm_packages")) {
+			sout += fmt.Sprintf("Target is APT based, query won't return anything: %v", cmd)
+		} else if len(out) == 0 {
+			sout += fmt.Sprintf("No response for the following query from this machine : %v", cmd)
+		}
 	}
 
 	return sout
