@@ -354,6 +354,34 @@ func SetMux(mux http.ServeMux) {
 		fmt.Fprintf(w, sout)
 	})
 
+	mux.HandleFunc("/rpm_package_files", func(w http.ResponseWriter, req *http.Request) {
+
+		cmd := "osqueryi " + "\"" + coq["rpm_package_files"] + "\""
+		sout := dispatchCmd(cmd)
+		fmt.Fprintf(w, sout)
+	})
+
+	mux.HandleFunc("/rpm_packages", func(w http.ResponseWriter, req *http.Request) {
+
+		cmd := "osqueryi " + "\"" + coq["rpm_packages"] + "\""
+		sout := dispatchCmd(cmd)
+		fmt.Fprintf(w, sout)
+	})
+
+	mux.HandleFunc("/apt_sources", func(w http.ResponseWriter, req *http.Request) {
+
+		cmd := "osqueryi " + "\"" + doq["apt_sources"] + "\""
+		sout := dispatchCmd(cmd)
+		fmt.Fprintf(w, sout)
+	})
+
+	mux.HandleFunc("/deb_packages", func(w http.ResponseWriter, req *http.Request) {
+
+		cmd := "osqueryi " + "\"" + doq["deb_packages"] + "\""
+		sout := dispatchCmd(cmd)
+		fmt.Fprintf(w, sout)
+	})
+
 }
 
 func dispatchCmd(cmd string) string {
@@ -364,8 +392,13 @@ func dispatchCmd(cmd string) string {
 	}
 	sout := string(out[:])
 
-	if len(sout) == 0 {
+	if len(sout) == 0 && (strings.Contains(cmd, "apt_resources") || strings.Contains(cmd, "deb_packages")) {
+		sout = fmt.Sprintf("Target is RPM based, query won't return anything: %v", cmd)
+	} else if len(sout) == 0 && (strings.Contains(cmd, "rpm_package_files") || strings.Contains(cmd, "rpm_packages")) {
+		sout = fmt.Sprintf("Target is APT based, query won't return anything: %v", cmd)
+	} else if len(sout) == 0 {
 		sout = fmt.Sprintf("No response for the following query from this machine : %v", cmd)
 	}
+
 	return sout
 }
