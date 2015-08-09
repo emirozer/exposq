@@ -9,8 +9,9 @@ import (
 	"strings"
 	"time"
 
-	json "github.com/bitly/go-simplejson"
-	"golang.org/x/crypto/ssh"
+	json "github.com/emirozer/exposq/Godeps/_workspace/src/github.com/bitly/go-simplejson"
+
+	"github.com/emirozer/exposq/Godeps/_workspace/src/golang.org/x/crypto/ssh"
 )
 
 // func responsible of parsing the target.json file
