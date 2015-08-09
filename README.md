@@ -20,6 +20,8 @@ After running the command above, you need to create a file called **targets.json
 Example formatting of targets.json file:
 
 ![Screenshot](https://raw.githubusercontent.com/emirozer/exposq/master/docs/targetsjson.png)
+*Important Note* : It expects a private key
+
 
 ##Usage
 
