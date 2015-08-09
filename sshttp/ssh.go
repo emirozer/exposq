@@ -43,7 +43,7 @@ func readTarget() ([][]string, string) {
 	return target_list, key
 }
 
-func sshDispatch(cmd string, user string, ip string, key string) string {
+func sshDispatch(cmd string, user string, ip string, key string, messages chan<- string) {
 	var res string
 	pemBytes, err := ioutil.ReadFile(key)
 	if err != nil {
@@ -74,11 +74,27 @@ func sshDispatch(cmd string, user string, ip string, key string) string {
 		// upon dispatching a query that can result in Process exited with 1
 		// it shouldn't completly fail, the thing here is that that OS
 		// was not compatible with that query, so we return empty str
-		return ""
-	}
 
-	res = stdoutBuf.String()
-	return res
+		res += fmt.Sprintf("\nMachine: %v@%v\n", user, ip)
+
+		if strings.Contains(cmd, "apt_resources") || strings.Contains(cmd, "deb_packages") {
+			res += fmt.Sprintf("Target is RPM based, query won't return anything: %v\n", cmd)
+		} else if strings.Contains(cmd, "rpm_package_files") || strings.Contains(cmd, "rpm_packages") {
+			res += fmt.Sprintf("Target is APT based, query won't return anything: %v\n", cmd)
+		} else {
+			res += fmt.Sprintf("No response for the following query from this machine : %v\n", cmd)
+		}
+
+		messages <- res
+
+	} else {
+
+		res += fmt.Sprintf("\nMachine: %v@%v\n", user, ip)
+		res += stdoutBuf.String()
+		res = string(res[:])
+		messages <- res
+
+	}
 }
 
 func MainSshHandler(cmd string) string {
@@ -87,24 +103,28 @@ func MainSshHandler(cmd string) string {
 	var user string
 	var ip string
 	var sout string
+	var sout_l []string
+
 	target_list, key = readTarget()
+
+	messages := make(chan string, len(target_list))
 
 	for _, j := range target_list {
 
 		user = j[0]
 		ip = j[1]
 
-		out := sshDispatch(cmd, user, ip, key)
-		sout += fmt.Sprintf("\nMachine: %v@%v\n", user, ip)
-		sout += string(out[:])
+		go sshDispatch(cmd, user, ip, key, messages)
 
-		if len(out) == 0 && (strings.Contains(cmd, "apt_resources") || strings.Contains(cmd, "deb_packages")) {
-			sout += fmt.Sprintf("Target is RPM based, query won't return anything: %v\n", cmd)
-		} else if len(out) == 0 && (strings.Contains(cmd, "rpm_package_files") || strings.Contains(cmd, "rpm_packages")) {
-			sout += fmt.Sprintf("Target is APT based, query won't return anything: %v\n", cmd)
-		} else if len(out) == 0 {
-			sout += fmt.Sprintf("No response for the following query from this machine : %v\n", cmd)
-		}
+	}
+
+	for len(sout_l) < len(target_list) {
+
+		sout_l = append(sout_l, <-messages)
+	}
+
+	for _, v := range sout_l {
+		sout += v
 	}
 
 	return sout
