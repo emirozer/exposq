@@ -7,11 +7,13 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	json "github.com/bitly/go-simplejson"
 	"golang.org/x/crypto/ssh"
 )
 
+// func responsible of parsing the target.json file
 func readTarget() ([][]string, string) {
 
 	target_list := make([][]string, 0)
@@ -43,6 +45,7 @@ func readTarget() ([][]string, string) {
 	return target_list, key
 }
 
+// func that is responsible of setting the session and communicating
 func sshDispatch(cmd string, user string, ip string, key string, messages chan<- string) {
 	var res string
 	pemBytes, err := ioutil.ReadFile(key)
@@ -73,7 +76,7 @@ func sshDispatch(cmd string, user string, ip string, key string, messages chan<-
 	if err != nil {
 		// upon dispatching a query that can result in Process exited with 1
 		// it shouldn't completly fail, the thing here is that that OS
-		// was not compatible with that query, so we return empty str
+		// was not compatible with that query, so we handle some cases here
 
 		res += fmt.Sprintf("\nMachine: %v@%v\n", user, ip)
 
@@ -97,6 +100,7 @@ func sshDispatch(cmd string, user string, ip string, key string, messages chan<-
 	}
 }
 
+// Returns the result that has been gathered from target machines
 func MainSshHandler(cmd string) string {
 	var target_list [][]string
 	var key string
@@ -120,7 +124,12 @@ func MainSshHandler(cmd string) string {
 
 	for len(sout_l) < len(target_list) {
 
-		sout_l = append(sout_l, <-messages)
+		select {
+		case <-time.After(time.Second * 20):
+			break
+		default:
+			sout_l = append(sout_l, <-messages)
+		}
 	}
 
 	for _, v := range sout_l {
