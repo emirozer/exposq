@@ -18,7 +18,7 @@ import (
 func readTarget() ([][]string, string) {
 
 	target_list := make([][]string, 0)
-	t, err := os.Open("target.json")
+	t, err := os.Open("targets.json")
 	defer t.Close()
 	if err != nil {
 		panic(err)
