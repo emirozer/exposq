@@ -1,5 +1,0 @@
-{
-	"ImportPath": "github.com/emirozer/exposq/osquery",
-	"GoVersion": "go1.4.2",
-	"Deps": []
-}
