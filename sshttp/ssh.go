@@ -2,48 +2,48 @@ package sshttp
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"github.com/emirozer/exposq/Godeps/_workspace/src/golang.org/x/crypto/ssh"
 	"io/ioutil"
 	"log"
-	"os"
 	"strings"
 	"time"
-
-	json "github.com/emirozer/exposq/Godeps/_workspace/src/github.com/bitly/go-simplejson"
-
-	"github.com/emirozer/exposq/Godeps/_workspace/src/golang.org/x/crypto/ssh"
 )
 
-// func responsible of parsing the target.json file
-func readTarget() ([][]string, string) {
+type jsonOptions struct {
+	Key     string    `json:"key"`
+	Targets []*target `json:"targets"`
+}
 
-	target_list := make([][]string, 0)
-	t, err := os.Open("targets.json")
-	defer t.Close()
+type target struct {
+	User string `json:"user"`
+	Ip   string `json:"ip"`
+	Key  string `json:"key"`
+}
+
+// func responsible of parsing the target.json file
+func readTarget() []*target {
+	byt, err := ioutil.ReadFile("targets.json")
 	if err != nil {
 		panic(err)
 	}
 
-	js, err := json.NewFromReader(t)
+	var opts jsonOptions
+	err = json.Unmarshal(byt, &opts)
+
 	if err != nil {
-		log.Fatal(err)
-	}
-	key, _ := js.Get("key").String()
-
-	targets := js.Get("targets")
-	temp_t, _ := js.Get("targets").Array()
-
-	for k, _ := range temp_t {
-		temp_slice := make([]string, 0)
-		user, _ := targets.GetIndex(k).Get("user").String()
-		ip, _ := targets.GetIndex(k).Get("ip").String()
-
-		temp_slice = append(temp_slice, user)
-		temp_slice = append(temp_slice, ip)
-		target_list = append(target_list, temp_slice)
+		panic(err)
 	}
 
-	return target_list, key
+	// set key to default if needed
+	for _, t := range opts.Targets {
+		if len(t.Key) == 0 {
+			t.Key = opts.Key
+		}
+	}
+
+	return opts.Targets
 }
 
 // func that is responsible of setting the session and communicating
@@ -103,27 +103,17 @@ func sshDispatch(cmd string, user string, ip string, key string, messages chan<-
 
 // Returns the result that has been gathered from target machines
 func MainSshHandler(cmd string) string {
-	var target_list [][]string
-	var key string
-	var user string
-	var ip string
 	var sout string
 	var sout_l []string
 
-	target_list, key = readTarget()
+	targets := readTarget()
+	messages := make(chan string, len(targets))
 
-	messages := make(chan string, len(target_list))
-
-	for _, j := range target_list {
-
-		user = j[0]
-		ip = j[1]
-
-		go sshDispatch(cmd, user, ip, key, messages)
-
+	for _, t := range targets {
+		go sshDispatch(cmd, t.User, t.Ip, t.Key, messages)
 	}
 
-	for len(sout_l) < len(target_list) {
+	for len(sout_l) < len(targets) {
 
 		select {
 		case <-time.After(time.Second * 20):
