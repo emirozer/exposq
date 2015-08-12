@@ -25,7 +25,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   export PATH=$PATH:$GOPATH/bin
   echo 'export PATH=$PATH:$GOPATH/bin' >> .bashrc
   go get github.com/emirozer/exposq
-  nohup exposq &
+  nohup exposq -vagrant &
   SCRIPT
 
   config.vm.provision "shell", inline: $script, privileged: false
