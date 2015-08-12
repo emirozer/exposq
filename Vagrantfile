@@ -1,8 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-#require 'socket'
 
-#local_ip = UDPSocket.open {|s| s.connect("64.233.187.99", 1); s.addr.last}
+
+require 'socket'
+ip_address = Socket.ip_address_list.find { |ai| ai.ipv4? && !ai.ipv4_loopback? }.ip_address
 
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
@@ -15,7 +16,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = 'centos'
   config.vm.boot_timeout = 500
   config.vm.network :forwarded_port, guest: 3000, host: 3000
-  config.vm.network "private_network"
+  config.vm.network "private_network", type: "dhcp"
   
   $script = <<-SCRIPT
   mkdir ~/go
