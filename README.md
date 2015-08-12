@@ -21,8 +21,23 @@ Example formatting of targets.json file:
 
 ![Screenshot](https://raw.githubusercontent.com/emirozer/exposq/master/docs/targetsjson.png)
 
-*Important Note* : It expects a private key
-
+*Important Notes* : It expects a private key and you can give a key file specific to a target like the following json structure
+```
+{
+    targets: [
+        {
+            "user": user,
+            "ip": ip,
+            "key": "key file",
+        },
+        {
+            "user": user,
+            "ip": ip
+        }
+    ],
+    "key": "global key file"
+}
+```
 
 ##Usage
 
