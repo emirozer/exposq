@@ -3,8 +3,8 @@ package main
 import (
 	"net/http"
 
+	"./sshttp"
 	"github.com/emirozer/exposq/Godeps/_workspace/src/github.com/codegangsta/negroni"
-	"github.com/emirozer/exposq/sshttp"
 )
 
 func main() {
