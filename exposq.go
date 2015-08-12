@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"net/http"
 
 	"./sshttp"
@@ -14,5 +15,14 @@ func main() {
 
 	n := negroni.Classic()
 	n.UseHandler(mux)
-	n.Run(":3000")
+
+	vagrant := flag.Bool("vagrant", false, "If you pass the arg -vagrant the http server starts at 0.0.0.0:3000 so portforwarding works")
+	flag.Parse()
+
+	if *vagrant {
+		n.Run("0.0.0.0:3000")
+	} else {
+		n.Run(":3000")
+	}
+
 }
