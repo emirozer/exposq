@@ -1,6 +1,6 @@
 package osquery
 
-// Function returns a map of pre-built osqueries specific to CentOS
+//CentOsQueries returns a map of pre-built osqueries specific to CentOS
 func CentOsQueries() map[string]string {
 	cosq := map[string]string{
 		//Get rmp_package_files table
@@ -11,7 +11,7 @@ func CentOsQueries() map[string]string {
 	return cosq
 }
 
-// Function returns a map of pre-built osqueries specific to Deb/Ub
+//DebUbOsQueries returns a map of pre-built osqueries specific to Deb/Ub
 func DebUbOsQueries() map[string]string {
 	dosq := map[string]string{
 		//Get apt_sources table
@@ -22,7 +22,7 @@ func DebUbOsQueries() map[string]string {
 	return dosq
 }
 
-// Function returns a map of pre-built osqueries that are generic to OS (meaning CentOS/Deb/Ubuntu)
+//GenericOsQueries returns a map of pre-built osqueries that are generic to OS (meaning CentOS/Deb/Ubuntu)
 func GenericOsQueries() map[string]string {
 
 	osq := map[string]string{

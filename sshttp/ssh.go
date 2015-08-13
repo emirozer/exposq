@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/emirozer/exposq/Godeps/_workspace/src/golang.org/x/crypto/ssh"
 	"io/ioutil"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/emirozer/exposq/Godeps/_workspace/src/golang.org/x/crypto/ssh"
 )
 
 type jsonOptions struct {
@@ -18,7 +19,7 @@ type jsonOptions struct {
 
 type target struct {
 	User string `json:"user"`
-	Ip   string `json:"ip"`
+	IP   string `json:"ip"`
 	Key  string `json:"key"`
 }
 
@@ -101,29 +102,29 @@ func sshDispatch(cmd string, user string, ip string, key string, messages chan<-
 	}
 }
 
-// Returns the result that has been gathered from target machines
-func MainSshHandler(cmd string) string {
+//MainSSHHandler returns the result that has been gathered from target machines
+func MainSSHHandler(cmd string) string {
 	var sout string
-	var sout_l []string
+	var soutL []string
 
 	targets := readTarget()
 	messages := make(chan string, len(targets))
 
 	for _, t := range targets {
-		go sshDispatch(cmd, t.User, t.Ip, t.Key, messages)
+		go sshDispatch(cmd, t.User, t.IP, t.Key, messages)
 	}
 
-	for len(sout_l) < len(targets) {
+	for len(soutL) < len(targets) {
 
 		select {
 		case <-time.After(time.Second * 20):
 			break
 		default:
-			sout_l = append(sout_l, <-messages)
+			soutL = append(soutL, <-messages)
 		}
 	}
 
-	for _, v := range sout_l {
+	for _, v := range soutL {
 		sout += v
 	}
 
