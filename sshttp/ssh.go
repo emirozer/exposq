@@ -117,10 +117,12 @@ func MainSSHHandler(cmd string) string {
 	for len(soutL) < len(targets) {
 
 		select {
+
 		case <-time.After(time.Second * 20):
 			break
 		default:
 			soutL = append(soutL, <-messages)
+
 		}
 	}
 
