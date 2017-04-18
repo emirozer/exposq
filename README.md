@@ -5,10 +5,10 @@ This is a tiny app i made, that you would run locally on your workstation and it
 The commands are listed in the main root route of the app so you don't need to dig deep. And i really like osquery project, if you have never checked it out, you should probably take a look.
 
 
-##Requirement
+## Requirement
 The only requirement is that your target machines should have osquery installed on them, thats it..
 
-##Install
+## Install
 
 Standart Procedure
 
@@ -39,7 +39,7 @@ Example formatting of targets.json file:
 }
 ```
 
-##Usage
+## Usage
 
 After that just run:
 
@@ -54,7 +54,7 @@ And the main route will show you which queries you can dispatch :
 
 ![Screenshot](https://raw.githubusercontent.com/emirozer/exposq/master/docs/rootroute.png)
 <br>
-##Examples:
+## Examples:
 <br>
 
 
